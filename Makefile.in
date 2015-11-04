@@ -1,0 +1,16 @@
+prefix = @prefix@
+srcdir = @srcdir@
+VPATH = $(srcdir)
+builddir = @builddir@
+includedir = $(prefix)/include
+pkgconfigdir = $(prefix)/share/pkgconfig
+INSTALL = @INSTALL@
+
+all: flexdp.pc
+
+install: flexdp.h flexdp.pc
+	$(INSTALL) -D -T -m 644 $(srcdir)/flexdp.h $(DESTDIR)$(includedir)/flexdp.h
+	$(INSTALL) -D -T -m 644 flexdp.pc $(DESTDIR)$(pkgconfigdir)/flexdp.pc
+
+uninstall:
+	rm -f $(DESTDIR)$(includedir)/flexdp.h $(DESTDIR)$(pkgconfigdir)/flexdp.pc

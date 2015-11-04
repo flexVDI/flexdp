@@ -1,0 +1,6 @@
+Name: flexdp
+Description: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+Requires: spice-protocol >= 0.12
+
+Cflags: -I@prefix@/include
