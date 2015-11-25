@@ -3,6 +3,8 @@
 
 AC_PREREQ([2.69])
 AC_INIT([flexVDI Desktop Protocol], [2.2.1], [devel@flexvdi.com], [flexdp], [https://www.flexvdi.com])
+AM_INIT_AUTOMAKE
+
 AC_CONFIG_SRCDIR([flexdp.h])
 AC_PROG_INSTALL
 
