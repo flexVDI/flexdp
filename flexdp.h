@@ -78,6 +78,7 @@ static inline const char * getCredentialsDomain(const FlexVDICredentialsMsg * ms
 
 
 typedef struct FlexVDIAskCredentialsMsg {
+    uint8_t dummy; // C99: Empty structure yields undefined behavior
 } FlexVDIAskCredentialsMsg;
 
 
@@ -116,6 +117,7 @@ typedef struct FlexVDIUnsharePrinterMsg {
 
 
 typedef struct FlexVDIResetMsg {
+    uint8_t dummy;
 } FlexVDIResetMsg;
 
 
