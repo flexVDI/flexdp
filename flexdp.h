@@ -21,7 +21,7 @@
 #ifdef WORDS_BIGENDIAN
 #define BYTESWAP32(val) (uint32_t)val = SPICE_BYTESWAP32((uint32_t)val)
 #else
-#define BYTESWAP32(val)
+#define BYTESWAP32(val) (void)val
 #endif
 
 SPICE_BEGIN_DECLS
