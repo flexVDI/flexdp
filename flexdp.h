@@ -55,6 +55,7 @@ enum {
     FLEXVDI_SHAREPRINTER            = 4,
     FLEXVDI_UNSHAREPRINTER          = 5,
     FLEXVDI_RESET                   = 6,
+    FLEXVDI_CAPABILITIES            = 7,
     FLEXVDI_MAX_MESSAGE_TYPE // Must be the last one
 };
 
@@ -121,6 +122,22 @@ typedef struct FlexVDIResetMsg {
 } FlexVDIResetMsg;
 
 
+enum {
+    FLEXVDI_CAP_PRINTING = 0,
+};
+
+typedef struct FlexVDICapabilitiesMsg {
+    uint32_t caps[4];
+} FlexVDICapabilitiesMsg;
+
+static inline int supportsCapability(const FlexVDICapabilitiesMsg * msg, unsigned int cap) {
+    return cap < 128 && (msg->caps[cap >> 5] & (1 << (cap % 32)));
+}
+static inline void setCapability(FlexVDICapabilitiesMsg * msg, unsigned int cap) {
+    if (cap < 128) msg->caps[cap >> 5] |= (1 << (cap % 32));
+}
+
+
 #ifdef FLEXVDI_PROTO_IMPL
 
 enum {
@@ -175,6 +192,11 @@ size_t msgOp(uint32_t type, int op, uint8_t * data, size_t bytes) {
                        BYTESWAP32(msg->printerNameLength);
         );
         MSG_OPERATIONS_EMPTY(FlexVDIResetMsg, FLEXVDI_RESET);
+        MSG_OPERATIONS(FlexVDICapabilitiesMsg, FLEXVDI_CAPABILITIES, 0,
+                       int i;
+                       for (i = 0; i < 4; ++i)
+                           BYTESWAP32(msg->caps[i]);
+        );
         default: return 0;
     }
 }
