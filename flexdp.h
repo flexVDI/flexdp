@@ -56,6 +56,7 @@ enum {
     FLEXVDI_UNSHAREPRINTER          = 5,
     FLEXVDI_RESET                   = 6,
     FLEXVDI_CAPABILITIES            = 7,
+    FLEXVDI_SESSIONEVENT            = 8,
     FLEXVDI_MAX_MESSAGE_TYPE // Must be the last one
 };
 
@@ -138,6 +139,18 @@ static inline void setCapability(FlexVDICapabilitiesMsg * msg, unsigned int cap)
 }
 
 
+enum {
+    FLEXVDI_SESSION_LOGIN  = 0,
+    FLEXVDI_SESSION_LOGOUT,
+    FLEXVDI_SESSION_LAST
+};
+
+typedef struct FlexVDISessionEventMsg {
+    uint32_t eventType;
+    uint32_t sessionId;
+} FlexVDISessionEventMsg;
+
+
 #ifdef FLEXVDI_PROTO_IMPL
 
 enum {
@@ -196,6 +209,10 @@ size_t msgOp(uint32_t type, int op, uint8_t * data, size_t bytes) {
                        int i;
                        for (i = 0; i < 4; ++i)
                            BYTESWAP32(msg->caps[i]);
+        );
+        MSG_OPERATIONS(FlexVDISessionEventMsg, FLEXVDI_SESSIONEVENT, 0,
+                       BYTESWAP32(msg->eventType);
+                       BYTESWAP32(msg->sessionId);
         );
         default: return 0;
     }
