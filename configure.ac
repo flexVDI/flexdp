@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.67])
-AC_INIT([flexVDI Desktop Protocol], [2.2.3], [devel@flexvdi.com], [flexdp], [https://www.flexvdi.com])
+AC_PREREQ([2.63])
+AC_INIT([flexVDI Desktop Protocol], [2.2.4], [devel@flexvdi.com], [flexdp], [https://www.flexvdi.com])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([flexdp.h])
