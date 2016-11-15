@@ -137,6 +137,9 @@ static inline int supportsCapability(const FlexVDICapabilitiesMsg * msg, unsigne
 static inline void setCapability(FlexVDICapabilitiesMsg * msg, unsigned int cap) {
     if (cap < 128) msg->caps[cap >> 5] |= (1 << (cap % 32));
 }
+static inline void resetCapability(FlexVDICapabilitiesMsg * msg, unsigned int cap) {
+    if (cap < 128) msg->caps[cap >> 5] &= ~(1 << (cap % 32));
+}
 
 
 enum {
