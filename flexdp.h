@@ -73,6 +73,13 @@ enum {
     FLEXVDI_CAPABILITIES            = 7,
     FLEXVDI_SESSIONEVENT            = 8,
     FLEXVDI_POWEREVENT              = 9,
+    FLEXVDI_FWDLISTEN               = 10,
+    FLEXVDI_FWDACCEPTED             = 11,
+    FLEXVDI_FWDSHUTDOWN             = 12,
+    FLEXVDI_FWDCONNECT              = 13,
+    FLEXVDI_FWDCLOSE                = 14,
+    FLEXVDI_FWDDATA                 = 15,
+    FLEXVDI_FWDACK                  = 16,
     FLEXVDI_MAX_MESSAGE_TYPE // Must be the last one
 };
 
@@ -140,8 +147,9 @@ typedef struct FlexVDIResetMsg {
 
 
 enum {
-    FLEXVDI_CAP_PRINTING = 0,
-    FLEXVDI_CAP_POWEREVENT,
+    FLEXVDI_CAP_PRINTING   = 0,
+    FLEXVDI_CAP_POWEREVENT = 1,
+    FLEXVDI_CAP_FORWARD    = 2,
 };
 
 typedef struct FlexVDICapabilitiesMsg {
@@ -181,6 +189,57 @@ enum {
 typedef struct FlexVDIPowerEventMsg {
     uint32_t event;
 } FlexVDIPowerEventMsg;
+
+
+enum {
+    FLEXVDI_FWDPROTO_TCP  = 0,
+    FLEXVDI_FWDPROTO_UDP  = 1,
+    FLEXVDI_FWDPROTO_UNIX  = 2,
+};
+
+typedef struct FlexVDIForwardListenMsg {
+    uint32_t id;
+    uint32_t proto;
+    uint32_t port;
+    uint32_t addressLength;
+    char address[0]; // address + '\0'
+} FlexVDIForwardListenMsg;
+
+typedef struct FlexVDIForwardAcceptedMsg {
+    uint32_t listenId;
+    uint32_t id;
+    uint32_t winSize;
+} FlexVDIForwardAcceptedMsg;
+
+typedef struct FlexVDIForwardShutdownMsg {
+    uint32_t listenId;
+} FlexVDIForwardShutdownMsg;
+
+typedef struct FlexVDIForwardConnectMsg {
+    uint32_t id;
+    uint32_t winSize;
+    uint32_t proto;
+    uint32_t port;
+    uint32_t addressLength;
+    char address[0]; // address + '\0'
+} FlexVDIForwardConnectMsg;
+
+typedef struct FlexVDIForwardCloseMsg {
+    uint32_t id;
+    uint32_t error; // Errno. 0 means no error.
+} FlexVDIForwardCloseMsg;
+
+typedef struct FlexVDIForwardDataMsg {
+    uint32_t id;
+    uint32_t size;
+    uint8_t data[0];
+} FlexVDIForwardDataMsg;
+
+typedef struct FlexVDIForwardAckMsg {
+    uint32_t id;
+    uint32_t size;
+    uint32_t winSize;
+} FlexVDIForwardAckMsg;
 
 
 #ifdef FLEXVDI_PROTO_IMPL
@@ -248,6 +307,43 @@ size_t msgOp(uint32_t type, int op, uint8_t * data, size_t bytes) {
         );
         MSG_OPERATIONS(FlexVDIPowerEventMsg, FLEXVDI_POWEREVENT, 0,
                        BYTESWAP32(msg->event);
+        );
+        MSG_OPERATIONS(FlexVDIForwardListenMsg, FLEXVDI_FWDLISTEN,
+                       msg->addressLength + 1,
+                       BYTESWAP32(msg->id);
+                       BYTESWAP32(msg->proto);
+                       BYTESWAP32(msg->port);
+                       BYTESWAP32(msg->addressLength);
+        );
+        MSG_OPERATIONS(FlexVDIForwardAcceptedMsg, FLEXVDI_FWDACCEPTED, 0,
+                       BYTESWAP32(msg->listenId);
+                       BYTESWAP32(msg->id);
+                       BYTESWAP32(msg->winSize);
+        );
+        MSG_OPERATIONS(FlexVDIForwardShutdownMsg, FLEXVDI_FWDSHUTDOWN, 0,
+                       BYTESWAP32(msg->listenId);
+        );
+        MSG_OPERATIONS(FlexVDIForwardConnectMsg, FLEXVDI_FWDCONNECT,
+                       msg->addressLength + 1,
+                       BYTESWAP32(msg->id);
+                       BYTESWAP32(msg->winSize);
+                       BYTESWAP32(msg->proto);
+                       BYTESWAP32(msg->port);
+                       BYTESWAP32(msg->addressLength);
+        );
+        MSG_OPERATIONS(FlexVDIForwardCloseMsg, FLEXVDI_FWDCLOSE, 0,
+                       BYTESWAP32(msg->id);
+                       BYTESWAP32(msg->error);
+        );
+        MSG_OPERATIONS(FlexVDIForwardDataMsg, FLEXVDI_FWDDATA,
+                       msg->size,
+                       BYTESWAP32(msg->id);
+                       BYTESWAP32(msg->size);
+        );
+        MSG_OPERATIONS(FlexVDIForwardAckMsg, FLEXVDI_FWDACK, 0,
+                       BYTESWAP32(msg->id);
+                       BYTESWAP32(msg->size);
+                       BYTESWAP32(msg->winSize);
         );
         default: return 0;
     }
