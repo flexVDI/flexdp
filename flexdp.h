@@ -72,6 +72,7 @@ enum {
     FLEXVDI_RESET                   = 6,
     FLEXVDI_CAPABILITIES            = 7,
     FLEXVDI_SESSIONEVENT            = 8,
+    FLEXVDI_POWEREVENT              = 9,
     FLEXVDI_MAX_MESSAGE_TYPE // Must be the last one
 };
 
@@ -140,6 +141,7 @@ typedef struct FlexVDIResetMsg {
 
 enum {
     FLEXVDI_CAP_PRINTING = 0,
+    FLEXVDI_CAP_POWEREVENT,
 };
 
 typedef struct FlexVDICapabilitiesMsg {
@@ -167,6 +169,18 @@ typedef struct FlexVDISessionEventMsg {
     uint32_t eventType;
     uint32_t sessionId;
 } FlexVDISessionEventMsg;
+
+
+enum {
+    FLEXVDI_POWER_EVENT_RESET  = 0,
+    FLEXVDI_POWER_EVENT_POWEROFF,
+    FLEXVDI_POWER_EVENT_SHUTDOWN,
+    FLEXVDI_POWER_EVENT_LAST
+};
+
+typedef struct FlexVDIPowerEventMsg {
+    uint32_t event;
+} FlexVDIPowerEventMsg;
 
 
 #ifdef FLEXVDI_PROTO_IMPL
@@ -231,6 +245,9 @@ size_t msgOp(uint32_t type, int op, uint8_t * data, size_t bytes) {
         MSG_OPERATIONS(FlexVDISessionEventMsg, FLEXVDI_SESSIONEVENT, 0,
                        BYTESWAP32(msg->eventType);
                        BYTESWAP32(msg->sessionId);
+        );
+        MSG_OPERATIONS(FlexVDIPowerEventMsg, FLEXVDI_POWEREVENT, 0,
+                       BYTESWAP32(msg->event);
         );
         default: return 0;
     }
